@@ -1,24 +1,35 @@
-'use strict';
-var happystat = {
-	init : function() {
-      var sentimentDataRef = new Firebase('https://happystat.firebaseio.com/'),
-      	$passwordForm = $('.content-module form');
-
-     $passwordForm.bind('submit', function(e) {
+var happy = {
+  form : '.content-module form',
+  referrer : 'pwreset',
+  question : '.hs-question',
+  cdid : 'form input#username',
+  sentiment : 'form input[name=mood]:checked',
+  unbind : function() {
+    $(happy.form).unbind();
+  },
+  init : function() {
+                        var myDataRef = new Firebase('https://happystat.firebaseio.com/');
+      $(happy.form).bind('submit', function(e) {
         e.preventDefault();
-        var sentiment = $('input[name=mood]:checked').val(),
-          cdid = $('#cdid').val(),
-          question = $('.hs-question').text(),
-          referrer = $('#referrer').val();
-        sentimentDataRef.push({sentiment: sentiment, cdid: cdid, question : question, referrer : referrer, timestamp : Firebase.ServerValue.TIMESTAMP });
-        console.log('submitted sentiment');
-        $passwordForm.trigger('submit');
-
-      });
-    },
-};
+        
+        console.log('clicked');
+        var $sentiment = $(happy.sentiment).val(),
+                                $cdid = $(happy.cdid).val(),
+        $question = $(happy.question).text();
+        referrer = happy.referrer;
+        if (!$sentiment) {
+          $sentiment = "noparticipation";
+        }
+        myDataRef.push({sentiment: $sentiment, cdid: $cdid, referrer : referrer, question : $question, timestamp : Firebase.ServerValue.TIMESTAMP });
+        console.log('submitted');
+        $(happy.form).unbind();
+                          $(happy.form).trigger('submit');
+      });   
+  }
+}
 $(function() {
-	if ($('.sentiment-form').length) {
-		happystat.init();
-	}
+    console.log( "ready!" );
+    if ($('.hs-wrapper').length) {
+  happy.init();
+    }
 });
